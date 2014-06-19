@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head></head>
+    <body>
+       <style>
+           table tbody tr:nth-child(2n) {
+               background: #F0F0F0;
+           }
+       </style>
+       <div id="placeholder"></div>
+       <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+       <script src="jquery.tablesorter.min.js"></script>
+       <script>
+         $(document).ready(function() {
+            var _table = null;
+            $("#placeholder").append();
+            $.ajax({
+                url: "/getter.php?grupo=Grupo ATL ROJO"
+            }).done(function (result) {
+                var _html = $(result);
+                _table = _html.find("#posiciones_grupo").find("table");
+                $.ajax({
+                    url: "/getter.php?grupo=Grupo ATL Verde"
+                }).done(function (result) {
+                    var _html = $(result);
+                    _table.find("tbody").append(_html.find("#posiciones_grupo").find("table").find("tr:not(:first)"));
+                    $.ajax({
+                        url: "/getter.php?grupo=Grupo ATL Negro"
+                    }).done(function (result) {
+                        var _html = $(result);
+                        _table.find("tbody").append(_html.find("#posiciones_grupo").find("table").find("tr:not(:first)"));
+                        _table.prepend($("<thead>").append(_table.find("tr:first")));
+                        //_table.find("tbody tr:first").remove();
+                        _table.find("tr").each(function(){ $(this).find("td:first").remove(); });
+                        _table.find("tr").removeAttr("bgColor");
+                        $("#placeholder").append(_table).find("table").tablesorter({sortList: [[1,1],[0,0]]})
+                        
+                    });
+                });
+            });
+         });
+       </script>
+    </body>
+</html>
