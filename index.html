@@ -15,17 +15,17 @@
             var _table = null;
             $("#placeholder").append();
             $.ajax({
-                url: "/getter.php?grupo=Grupo ATL ROJO"
+                url: "http://prode.162.243.6.106.xip.io/getter.php?grupo=Grupo ATL ROJO"
             }).done(function (result) {
                 var _html = $(result);
                 _table = _html.find("#posiciones_grupo").find("table");
                 $.ajax({
-                    url: "/getter.php?grupo=Grupo ATL Verde"
+                    url: "http://prode.162.243.6.106.xip.io/getter.php?grupo=Grupo ATL Verde"
                 }).done(function (result) {
                     var _html = $(result);
                     _table.find("tbody").append(_html.find("#posiciones_grupo").find("table").find("tr:not(:first)"));
                     $.ajax({
-                        url: "/getter.php?grupo=Grupo ATL Negro"
+                        url: "http://prode.162.243.6.106.xip.io/getter.php?grupo=Grupo ATL Negro"
                     }).done(function (result) {
                         var _html = $(result);
                         _table.find("tbody").append(_html.find("#posiciones_grupo").find("table").find("tr:not(:first)"));
