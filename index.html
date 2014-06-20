@@ -52,7 +52,7 @@
        <script src="jquery.tablesorter.min.js"></script>
        <script>
            var current = [];
-           	if(Notification.permission !== 'granted'){
+           /*if(Notification.permission !== 'granted'){
                 Notification.requestPermission();
             }
            function pushNotification (message) {
@@ -60,27 +60,31 @@
                     body: message, 
                     icon : "/images/ball.ico"
                 });
-           }
+           }*/
            function refreshRanking () {
                 var baseURL = "http://prode.162.243.6.106.xip.io";
                 if(window.location.host.indexOf("127.0.0.1") >= 0) {
                     var baseURL = "http://prode.127.0.0.1.xip.io";
                 }
+                console.log(baseURL);
                 //
                 var _table = null;
                 $.ajax({
                     url: baseURL + "/getter.php?grupo=Grupo ATL ROJO"
                 }).done(function (result) {
+                    console.log("llego info de MundialconAmigos");
                     var _html = $(result);
                     _table = _html.find("table");
                     $.ajax({
                         url: baseURL + "/getter.php?grupo=Grupo ATL Verde"
                     }).done(function (result) {
+                        console.log("llego info de MundialconAmigos");
                         var _html = $(result);
                         _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
                         $.ajax({
                             url: baseURL + "/getter.php?grupo=Grupo ATL Negro"
                         }).done(function (result) {
+                            console.log("llego info de MundialconAmigos");
                             var _html = $(result);
                             _table.addClass("pure-table pure-table-bordered table-ranking").removeAttr("align").removeAttr("width");
                             _table.find("td b").each(function(){
@@ -136,7 +140,10 @@
                                     $p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getHours() + "hs" +" ] " + status );
                                     $clone.append($p);
                                     //console.log($clone);
-
+                                    console.log(result[par]);
+                                    console.log(result[par].home_team);
+                                    console.log(result[par].home_team.goals);
+                                    console.log(parseInt(result[par].home_team.goals, 10));
                                 }
                                 $placeholder.prepend($clone);
                                 $clone.removeClass("load");
@@ -185,6 +192,7 @@
                                     status = (result[par].status == "in progress") ? "<strong>En juego</strong>" : "";
                                     status = (result[par].status == "completed") ? "<strong>Finalizado</strong>" : status;
                                     $p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getDate() + "/" + parseInt(d.getMonth() +1) + " - " + d.getHours() + "hs" +" ] " + status );
+                                    
                                     $clone.append($p);
                                 }
                                 $placeholder.append($clone);
@@ -200,7 +208,7 @@
                     }).done(function (result) {
                             if(result.length > 0) {
                                 if (current.length > 0 && !(result[0].away_team.goals === current[0].away_team.goals && result[0].home_team.goals === current[0].home_team.goals)) {
-                                    pushNotification(result[0].home_team.country + " " + result[0].home_team.goals + " - " + result[0].away_team.country + " " + result[0].away_team.goals);
+                                    //pushNotification(result[0].home_team.country + " " + result[0].home_team.goals + " - " + result[0].away_team.country + " " + result[0].away_team.goals);
                                 }
                                 $clone = $tpl_today_matches.clone().attr("id", "current");
                                 $clone.find("h2").html("En juego");
