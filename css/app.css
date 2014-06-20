@@ -29,8 +29,10 @@
     border: none;
     color: #AECFE5;
 }
-
-table tbody tr:nth-child(2n) {
+.table-ranking {
+    width: 80%;
+}
+.table-ranking tbody tr:nth-child(2n) {
    background: #F0F0F0;
 }
 #todays.load{
