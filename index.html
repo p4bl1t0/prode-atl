@@ -34,9 +34,10 @@
                 </div>
                 <div class="pure-u-1 pure-u-md-2-3">
                     <div class="box-content">
-                        <h2>Ranking del prode - <button class="pure-button button-refresh pure-button-active pure-button-primary">Actualizar</button> <a href="http://mundialconamigos.com" target="_blank" >< mundialconamigos.com ></a></h2>
+                        <h2>Ranking del prode - <button class="pure-button button-refresh pure-button-active pure-button-primary">Actualizar</button></h2>
 						<img src="http://upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif" alt="Cargando" id="img-cargando" >
                         <div id="placeholder-ranking"></div>
+                        <a href="http://mundialconamigos.com" target="_blank" >mundialconamigos.com</a>
                     </div>
                 </div>
             </div>
@@ -52,15 +53,19 @@
        <script src="jquery.tablesorter.min.js"></script>
        <script>
            var current = [];
-           /*if(Notification.permission !== 'granted'){
-                Notification.requestPermission();
-            }
+           if(window.Notification !== null && window.Notification !== undefined) {
+               if(Notification.permission !== 'granted'){
+                    Notification.requestPermission();
+                }
+           }
            function pushNotification (message) {
-                n = new Notification( "Goooooool", {
-                    body: message, 
-                    icon : "/images/ball.ico"
-                });
-           }*/
+               if(window.Notification !== null && window.Notification !== undefined) {
+                    n = new Notification( "Goooooool", {
+                        body: message, 
+                        icon : "/images/ball.ico"
+                    });
+               }
+           }
            function refreshRanking () {
                 var baseURL = "http://prode.162.243.6.106.xip.io";
                 if(window.location.host.indexOf("127.0.0.1") >= 0) {
@@ -104,6 +109,30 @@
                     });
                 });
            }
+           function renderResult(match, showDate) {
+                var html = "";
+                var date = new Date(match.datetime);
+                var status = "";
+                var showResult = true;
+                if (match.status === "in progress") {
+                    status = "<strong>En juego</strong>";
+                } else {
+                    if (match.status === "completed") {
+                        status = "<strong>Finalizado</strong>";
+                    } else {
+                        showResult = false;
+                    }
+                }
+                html = match.home_team.country + (showResult ? " " + match.home_team.goals : "");
+                html += " - ";
+                html += match.away_team.country + (showResult ? " " + match.away_team.goals : "");
+                if(showDate) {
+                    html += " " + date.getDate() + "/" + date.getMonth() + " ";
+                }
+                html += isNaN(date.getHours()) ? "" : " (" + date.getHours() + " hs" +") ";
+                html += status;
+                return html;
+           }
 	       $(document).ready(function() { //
                 $(".button-refresh").click(function (event) {
                     event.preventDefault();
@@ -112,7 +141,7 @@
                 refreshRanking();
                
                 getDataMatches();
-                currentMatch();
+                //currentMatch();
                
 
                 var timeRefreshResults = 30000;
@@ -133,17 +162,9 @@
                                 $clone = $tpl_today_matches.clone().attr("id","todays");
                                 for(var par in result) {
                                     var $p =$("<p>");
-                                    var d = new Date(result[par].datetime);
-                                    var status ="";
-                                    status = (result[par].status == "in progress") ? "<strong>En juego</strong>" : "";
-                                    status = (result[par].status == "completed") ? "<strong>Finalizado</strong>" : status;
-                                    $p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getHours() + "hs" +" ] " + status );
+                                    $p.addClass("match-results").html(renderResult(result[par]));
                                     $clone.append($p);
                                     //console.log($clone);
-                                    console.log(result[par]);
-                                    console.log(result[par].home_team);
-                                    console.log(result[par].home_team.goals);
-                                    console.log(parseInt(result[par].home_team.goals, 10));
                                 }
                                 $placeholder.prepend($clone);
                                 $clone.removeClass("load");
@@ -159,14 +180,13 @@
                     url:"http://worldcup.sfg.io/matches/tomorrow",
                     dataType: "json"
                 }).done(function (result) {
-                        if(result.length>0){
+                        if(result.length > 0){
                             $placeholder.find("#tomorrow").remove();
                             $clone = $tpl_today_matches.clone().attr("id","tomorrow");
                             $clone.find("h2").html("Partidos de mañana");
                             for(var par in result){
                                 var $p =$("<p>");
-                                var d = new Date(result[par].datetime);
-                                $p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " +  d.getHours() + "hs" +" ]");
+                                $p.addClass("match-results").html(renderResult(result[par]));
                                 $clone.append($p);
                                 argMatches();
                             }
@@ -187,11 +207,7 @@
                                 $clone.find("h2").html("Partidos de Argentina");
                                 for (var par in result) {
                                     var $p =$("<p>");
-                                    var d = new Date(result[par].datetime);
-                                    var status ="";
-                                    status = (result[par].status == "in progress") ? "<strong>En juego</strong>" : "";
-                                    status = (result[par].status == "completed") ? "<strong>Finalizado</strong>" : status;
-                                    $p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getDate() + "/" + parseInt(d.getMonth() +1) + " - " + d.getHours() + "hs" +" ] " + status );
+                                    $p.addClass("match-results").html(renderResult(result[par], true));
                                     
                                     $clone.append($p);
                                 }
@@ -208,14 +224,14 @@
                     }).done(function (result) {
                             if(result.length > 0) {
                                 if (current.length > 0 && !(result[0].away_team.goals === current[0].away_team.goals && result[0].home_team.goals === current[0].home_team.goals)) {
-                                    //pushNotification(result[0].home_team.country + " " + result[0].home_team.goals + " - " + result[0].away_team.country + " " + result[0].away_team.goals);
+                                    pushNotification(result[0].home_team.country + " " + result[0].home_team.goals + " - " + result[0].away_team.country + " " + result[0].away_team.goals);
                                 }
                                 $clone = $tpl_today_matches.clone().attr("id", "current");
                                 $clone.find("h2").html("En juego");
                                 for(var par in result){
                                     var $p =$("<p>");
                                     var d = new Date(result[par].datetime);
-                                    $p.addClass("match-results").html(result[par].home_team.country + " " + result[par].home_team.goals + "  -  " + result[par].away_team.country + " " + result[par].away_team.goals );
+                                    $p.addClass("match-results").html(result[par].home_team.country + " " + result[par].home_team.goals + "  -  " + result[par].away_team.country + " " + result[par].away_team.goals);
                                     $clone.append($p);
                                 }
                                 $placeholder_current.find("#current").remove();
