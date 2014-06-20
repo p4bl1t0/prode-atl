@@ -41,6 +41,11 @@
 .table-ranking tbody tr:nth-child(2n) {
    background: #F0F0F0;
 }
+@media (max-width:680px) {
+    .table-ranking tr td:nth-child(n+3) {
+       display: none;
+    }
+}
 #todays.load{
     background: url("http://upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif") no-repeat scroll center top rgba(0, 0, 0, 0);
 }
