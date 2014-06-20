@@ -129,10 +129,10 @@ var is_android = ((nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > 
                 html = match.home_team.country + (showResult ? " " + match.home_team.goals : "");
                 html += " - ";
                 html += match.away_team.country + (showResult ? " " + match.away_team.goals : "");
-                if(showDate) {
+                if(showDate & !isNaN(date.getDate())) {
                     html += " " + date.getDate() + "/" + date.getMonth() + " ";
                 }
-                html += isNaN(date.getHours()) ? "" : " (" + date.getHours() + " hs" +") ";
+                html += isNaN(date.getHours()) ? " " : " (" + date.getHours() + " hs" +") ";
                 html += status;
                 return html;
            }
