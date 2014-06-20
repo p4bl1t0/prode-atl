@@ -46,6 +46,29 @@
                     });
                 });
             });
+			
+			$.ajax({
+				url:"http://worldcup.sfg.io/matches/today",
+				dataType: "json"
+			}).done(function(result){
+				//console.log(result);
+				$body = $("body");
+				if(result.length>0){
+				$body.append("<h3>Partidos del día</h3");
+				for(var par in result){
+					console.log(result[par]);
+					$body.append("<div>");
+					$body.append(result[par].home_team.country);
+					$body.append("<span>&nbsp;&nbsp;&nbsp;" + result[par].home_team.goals+  "</span> &nbsp;&nbsp;&nbsp; -- &nbsp;&nbsp;&nbsp;");
+					$body.append("<span>&nbsp;&nbsp;&nbsp;" + result[par].away_team.goals+  "</span>");
+					$body.append(result[par].away_team.country);
+					$body.append("</div>");
+				}
+				}
+				
+				
+			});
+			
          });
        </script>
     </body>
