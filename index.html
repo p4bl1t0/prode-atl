@@ -54,13 +54,15 @@
        <script src="jquery.tablesorter.min.js"></script>
        <script>
            var current = [];
-           if(window.Notification !== null && window.Notification !== undefined) {
+           var nua = navigator.userAgent;
+var is_android = ((nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > -1 &&     nua.indexOf('AppleWebKit') > -1) && !(nua.indexOf('Chrome') > -1));
+           if(window.Notification !== null && window.Notification !== undefined && !is_android) {
                if(Notification.permission !== 'granted'){
                     Notification.requestPermission();
                 }
            }
            function pushNotification (message) {
-               if(window.Notification !== null && window.Notification !== undefined) {
+               if(window.Notification !== null && window.Notification !== undefined && !is_android) {
                     n = new Notification( "Goooooool", {
                         body: message, 
                         icon : "/images/ball.ico"
