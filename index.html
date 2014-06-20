@@ -45,7 +45,7 @@
 	    $(document).ready(function() { //
             //var baseURL = "http://prode.127.0.0.1.xip.io";
             var baseURL = "http://prode.162.243.6.106.xip.io";
-			var timeRefreshResults = 5000;
+			var timeRefreshResults = 60000;
             var _table = null;
             $.ajax({
                 url: baseURL + "/getter.php?grupo=Grupo ATL ROJO"
@@ -99,8 +99,10 @@
 								status = (result[par].status == "completed") ? "<strong>Finalizado<strong>" : status;
 								$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getHours() + "hs" +" ] " + status );
 								$clone.append($p);
-								$placeholder.prepend($clone);
+								//console.log($clone);
+								
 							}
+							$placeholder.prepend($clone);
 							$clone.removeClass("load");
 						}
 					}
@@ -116,7 +118,7 @@
 			}).done(
 				function(result){
 					if(result.length>0){
-						$placeholder.find("#todays").remove();
+						$placeholder.find("#tomorrow").remove();
 						$clone = $tpl_today_matches.clone().attr("id","tomorrow");
 						$clone.find("h2").html("Partidos de mañana");
 						for(var par in result){
@@ -124,13 +126,39 @@
 							var d = new Date(result[par].datetime);
 							$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " +  d.getHours() + "hs" +" ]");
 							$clone.append($p);
-							$placeholder.append($clone);
+							argMatches();
 						}
-						
+						$placeholder.append($clone);
 					}
 				}
 			);
 			
+			//partidos de argentina
+			function argMatches(){
+				$.ajax({
+					url:"http://worldcup.sfg.io/matches/country?fifa_code=ARG",
+					dataType: "json"
+				}).done(
+					function(result){
+						if(result.length>0){
+							$placeholder.find("#arg-matches").remove();
+							$clone = $tpl_today_matches.clone().attr("id","arg-matches");
+							$clone.find("h2").html("Partidos de Argentina");
+								for(var par in result){
+									var $p =$("<p>");
+									var d = new Date(result[par].datetime);
+									var status ="";
+									status = (result[par].status == "in progress") ? "<strong>En vivo<strong>" : "";
+									status = (result[par].status == "completed") ? "<strong>Finalizado<strong>" : status;
+									$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getDate() + "/" + parseInt(d.getMonth() +1) + " - " + d.getHours() + "hs" +" ] " + status );
+									$clone.append($p);
+									$placeholder.append($clone);
+								}
+							
+						}
+					}
+				);
+			}
 			
 			var interval = setInterval(function(){getDataMatches();}, timeRefreshResults);
          });
