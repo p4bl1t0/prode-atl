@@ -50,6 +50,6 @@
     background: url("http://upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif") no-repeat scroll center top rgba(0, 0, 0, 0);
 }
 
-#todays{
+#todays,#tomorrow{
 	border-bottom:1px dotted #DDD;
 }
