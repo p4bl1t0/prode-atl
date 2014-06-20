@@ -36,3 +36,7 @@ table tbody tr:nth-child(2n) {
 #todays.load{
     background: url("http://upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif") no-repeat scroll center top rgba(0, 0, 0, 0);
 }
+
+#todays{
+	border-bottom:3px dotted #3f3f3f;
+}
