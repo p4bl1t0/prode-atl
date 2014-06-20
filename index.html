@@ -6,20 +6,35 @@
            table tbody tr:nth-child(2n) {
                background: #F0F0F0;
            }
+		   .header{
+				width:633px;
+				margin:0 auto;
+			}
            .header img {
                display: block;
                margin: auto;
            }
+		   #todays.load{
+			background: url("http://upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif") no-repeat scroll center top rgba(0, 0, 0, 0);
+		   }
        </style>
        <div class="header">
             <img src="https://d1yoaun8syyxxt.cloudfront.net/wu113-a477a2f3-e09f-4456-b0ea-bcf256d1587e-v2" />
-           
        </div>
        <div id="placeholder"></div>
+	   
+	   <div style="display:none">
+			<div class="large-6 columns" id="tpl_todays_matches">
+				<h3>TODAY'S MATCHES</h3>
+			</div>
+	   </div>   
        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
        <script src="jquery.tablesorter.min.js"></script>
        <script>
+	   
         $(document).ready(function() { //
+			var timeRefreshResults = 5000;
+		
             var _table = null;
             $("#placeholder").append();
             $.ajax({
@@ -47,28 +62,40 @@
                 });
             });
 			
-			$.ajax({
-				url:"http://worldcup.sfg.io/matches/today",
-				dataType: "json"
-			}).done(function(result){
-				//console.log(result);
-				$body = $("body");
-				if(result.length>0){
-				$body.append("<h3>Partidos del día</h3");
-				for(var par in result){
-					console.log(result[par]);
-					$body.append("<div>");
-					$body.append(result[par].home_team.country);
-					$body.append("<span>&nbsp;&nbsp;&nbsp;" + result[par].home_team.goals+  "</span> &nbsp;&nbsp;&nbsp; -- &nbsp;&nbsp;&nbsp;");
-					$body.append("<span>&nbsp;&nbsp;&nbsp;" + result[par].away_team.goals+  "</span>");
-					$body.append(result[par].away_team.country);
-					$body.append("</div>");
-				}
-				}
-				
-				
-			});
+			getDataMatches();
 			
+			
+			var $placeholder = $(".header");
+			var $tpl_today_matches = $("#tpl_todays_matches");
+			
+			
+			var $clone;
+			function getDataMatches(){
+				if($clone != undefined){ $clone.addClass("load"); }
+				$.ajax({
+					url:"http://worldcup.sfg.io/matches/today",
+					dataType: "json"
+				}).done(
+					function(result){
+						if(result.length>0){
+							$placeholder.find("#todays").remove();
+							$clone = $tpl_today_matches.clone().attr("id","todays");
+							for(var par in result){
+								var $p =$("<p>");
+								var d = new Date(result[par].datetime);
+								$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " +  result[par].status + ": " +d.getHours() + "hs" +" ]");
+								$clone.append($p);
+								$placeholder.append($clone);
+							}
+							$clone.removeClass("load");
+						}
+					}
+				);
+				
+				
+			}
+			
+			var interval = setInterval(function(){getDataMatches();}, timeRefreshResults);
          });
        </script>
     </body>
