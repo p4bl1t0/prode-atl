@@ -6,12 +6,20 @@
            table tbody tr:nth-child(2n) {
                background: #F0F0F0;
            }
+           .header img {
+               display: block;
+               margin: auto;
+           }
        </style>
+       <div class="header">
+            <img src="https://d1yoaun8syyxxt.cloudfront.net/wu113-a477a2f3-e09f-4456-b0ea-bcf256d1587e-v2" />
+           
+       </div>
        <div id="placeholder"></div>
        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
        <script src="jquery.tablesorter.min.js"></script>
        <script>
-         $(document).ready(function() {
+        $(document).ready(function() { //
             var _table = null;
             $("#placeholder").append();
             $.ajax({
