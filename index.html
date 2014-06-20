@@ -95,7 +95,8 @@
 								var $p =$("<p>");
 								var d = new Date(result[par].datetime);
 								var status ="";
-								status = (result[par].status != "future") ? "<strong>Finalizado<strong>" : "";
+								status = (result[par].status == "in progress") ? "<strong>En vivo<strong>" : "";
+								status = (result[par].status == "completed") ? "<strong>Finalizado<strong>" : status;
 								$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getHours() + "hs" +" ] " + status );
 								$clone.append($p);
 								$placeholder.prepend($clone);
