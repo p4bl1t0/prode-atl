@@ -94,9 +94,11 @@
 							for(var par in result){
 								var $p =$("<p>");
 								var d = new Date(result[par].datetime);
-								$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " +  result[par].status + ": " +d.getHours() + "hs" +" ]");
+								var status ="";
+								status = (result[par].status != "future") ? "<strong>Finalizado<strong>" : "";
+								$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getHours() + "hs" +" ] " + status );
 								$clone.append($p);
-								$placeholder.append($clone);
+								$placeholder.prepend($clone);
 							}
 							$clone.removeClass("load");
 						}
@@ -105,6 +107,29 @@
 				
 				
 			}
+			
+			//tomorrow's matches
+			$.ajax({
+				url:"http://worldcup.sfg.io/matches/tomorrow",
+				dataType: "json"
+			}).done(
+				function(result){
+					if(result.length>0){
+						$placeholder.find("#todays").remove();
+						$clone = $tpl_today_matches.clone().attr("id","tomorrow");
+						$clone.find("h2").html("Partidos de mañana");
+						for(var par in result){
+							var $p =$("<p>");
+							var d = new Date(result[par].datetime);
+							$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " +  d.getHours() + "hs" +" ]");
+							$clone.append($p);
+							$placeholder.append($clone);
+						}
+						
+					}
+				}
+			);
+			
 			
 			var interval = setInterval(function(){getDataMatches();}, timeRefreshResults);
          });
