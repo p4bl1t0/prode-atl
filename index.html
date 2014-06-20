@@ -34,7 +34,7 @@
                 </div>
                 <div class="pure-u-1 pure-u-md-2-3">
                     <div class="box-content">
-                        <h2>Ranking del prode - <button class="pure-button button-refresh pure-button-active pure-button-primary">Refresh</button></h2>
+                        <h2>Ranking del prode - <button class="pure-button button-refresh pure-button-active pure-button-primary">Actualizar</button></h2>
 						<img src="http://upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif" alt="Cargando" id="img-cargando" >
                         <div id="placeholder-ranking"></div>
                     </div>
@@ -214,6 +214,11 @@
                                 $placeholder_current.prepend($clone);
                                 
                                 current = result;
+                            } else {
+                                $clone = $tpl_today_matches.clone().attr("id", "current");
+                                $clone.append("<p>Nada en juego</p>");
+                                $placeholder_current.find("#current").remove();
+                                $placeholder_current.prepend($clone);
                             }
                         }
                     );
