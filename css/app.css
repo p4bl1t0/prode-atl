@@ -29,6 +29,12 @@
     border: none;
     color: #AECFE5;
 }
+.box-content {
+    padding: 0 .5em;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
 .table-ranking {
     width: 80%;
 }
@@ -40,5 +46,5 @@
 }
 
 #todays{
-	border-bottom:3px dotted #3f3f3f;
+	border-bottom:1px dotted #DDD;
 }
