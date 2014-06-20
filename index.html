@@ -95,7 +95,7 @@
 								var $p =$("<p>");
 								var d = new Date(result[par].datetime);
 								var status ="";
-								status = (result[par].status = "future") ? "<strong>Finalizado<strong>" : "";
+								status = (result[par].status != "future") ? "<strong>Finalizado<strong>" : "";
 								$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getHours() + "hs" +" ] " + status );
 								$clone.append($p);
 								$placeholder.prepend($clone);
@@ -117,7 +117,7 @@
 					if(result.length>0){
 						$placeholder.find("#todays").remove();
 						$clone = $tpl_today_matches.clone().attr("id","tomorrow");
-						$clone.find("h3").html("TOMORROW'S MATCHES");
+						$clone.find("h2").html("Partidos de mañana");
 						for(var par in result){
 							var $p =$("<p>");
 							var d = new Date(result[par].datetime);
