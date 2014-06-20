@@ -53,3 +53,7 @@
 #todays,#tomorrow{
 	border-bottom:1px dotted #DDD;
 }
+.button-refresh {
+    font-size: .6em;
+    vertical-align: text-bottom;
+}

@@ -12,26 +12,29 @@
             <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">
         <!--<![endif]-->
         <link rel="stylesheet" href="css/app.css" />
+        <link rel="stylesheet" href="https://cdn.rawgit.com/kbjr/Notifications/master/notification.css" />
+        
     </head>
     <body>
         <div class="header">
             <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal">
                 <a href="#" class="pure-menu-heading">Prode Autologico</a>
-                <ul>
+                <!--<ul>
                     <li class="pure-menu-selected"><a href="#">Home</a></li>
-                </ul>
+                </ul>-->
             </div>
         </div>
         <div class="content">
             <div class="pure-g">
                 <div class="pure-u-1 pure-u-md-1-3">
                    <div class="box-content">
+                       <div id="placeholder-current"></div>
                        <div id="placeholder-partidos"></div>
                    </div>
                 </div>
                 <div class="pure-u-1 pure-u-md-2-3">
                     <div class="box-content">
-                        <h2>Ranking del prode</h2>
+                        <h2>Ranking del prode - <button class="pure-button button-refresh pure-button-active pure-button-primary">Refresh</button></h2>
 						<img src="http://upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif" alt="Cargando" id="img-cargando" >
                         <div id="placeholder-ranking"></div>
                     </div>
@@ -45,132 +48,181 @@
 			</div>
 	   </div>   
        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+       <script src="https://cdn.rawgit.com/kbjr/Notifications/master/notification.js"></script>
        <script src="jquery.tablesorter.min.js"></script>
        <script>
-	    $(document).ready(function() { //
-            //var baseURL = "http://prode.127.0.0.1.xip.io";
-            var baseURL = "http://prode.162.243.6.106.xip.io";
-			var timeRefreshResults = 60000;
-            var _table = null;
-            $.ajax({
-                url: baseURL + "/getter.php?grupo=Grupo ATL ROJO"
-            }).done(function (result) {
-                var _html = $(result);
-                _table = _html.find("table");
+           var current = [];
+           	if(Notification.permission !== 'granted'){
+                Notification.requestPermission();
+            }
+           function pushNotification (message) {
+                n = new Notification( "Goooooool", {
+                    body: message, 
+                    icon : "/images/ball.ico"
+                });
+           }
+           function refreshRanking () {
+                var baseURL = "http://prode.162.243.6.106.xip.io";
+                if(window.location.host.indexOf("127.0.0.1") >= 0) {
+                    var baseURL = "http://prode.127.0.0.1.xip.io";
+                }
+                //
+                var _table = null;
                 $.ajax({
-                    url: baseURL + "/getter.php?grupo=Grupo ATL Verde"
+                    url: baseURL + "/getter.php?grupo=Grupo ATL ROJO"
                 }).done(function (result) {
                     var _html = $(result);
-                    _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
+                    _table = _html.find("table");
                     $.ajax({
-                        url: baseURL + "/getter.php?grupo=Grupo ATL Negro"
+                        url: baseURL + "/getter.php?grupo=Grupo ATL Verde"
                     }).done(function (result) {
                         var _html = $(result);
-                        _table.addClass("pure-table pure-table-bordered table-ranking").removeAttr("align").removeAttr("width");
-                        _table.find("td b").each(function(){
-                            if(String.trim) {
-                                $(this).text($(this).text().trim());
-                            }
-                        });
                         _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
-                        _table.prepend($("<thead>").append(_table.find("tr:first")));
-                        //_table.find("tbody tr:first").remove();
-                        _table.find("tr").each(function(){ $(this).find("td:first").remove(); });
-                        _table.find("tr").removeAttr("bgColor");
-						$("#img-cargando").remove();
-                        $("#placeholder-ranking").append(_table).find("table").tablesorter({sortList: [[1,1],[0,0]]})
-                        
+                        $.ajax({
+                            url: baseURL + "/getter.php?grupo=Grupo ATL Negro"
+                        }).done(function (result) {
+                            var _html = $(result);
+                            _table.addClass("pure-table pure-table-bordered table-ranking").removeAttr("align").removeAttr("width");
+                            _table.find("td b").each(function(){
+                                if(String.trim) {
+                                    $(this).text($(this).text().trim());
+                                }
+                            });
+                            _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
+                            _table.prepend($("<thead>").append(_table.find("tr:first")));
+                            //_table.find("tbody tr:first").remove();
+                            _table.find("tr").each(function(){ $(this).find("td:first").remove(); });
+                            _table.find("tr").removeAttr("bgColor");
+                            $("#img-cargando").remove();
+                            $("#placeholder-ranking").empty().append(_table).find("table").tablesorter({sortList: [[1,1],[0,0]]})
+
+                        });
                     });
                 });
-            });
-			
-			getDataMatches();
-			
-			
-			var $placeholder = $("#placeholder-partidos");
-			var $tpl_today_matches = $("#tpl_todays_matches");
-			
-			
-			var $clone;
-			function getDataMatches(){
-				if($clone != undefined){ $clone.addClass("load"); }
-				$.ajax({
-					url:"http://worldcup.sfg.io/matches/today",
-					dataType: "json"
-				}).done(
-					function(result){
-						if(result.length>0){
-							$placeholder.find("#todays").remove();
-							$clone = $tpl_today_matches.clone().attr("id","todays");
-							for(var par in result){
-								var $p =$("<p>");
-								var d = new Date(result[par].datetime);
-								var status ="";
-								status = (result[par].status == "in progress") ? "<strong>En vivo</strong>" : "";
-								status = (result[par].status == "completed") ? "<strong>Finalizado</strong>" : status;
-								$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getHours() + "hs" +" ] " + status );
-								$clone.append($p);
-								//console.log($clone);
-								
-							}
-							$placeholder.prepend($clone);
-							$clone.removeClass("load");
-						}
-					}
-				);
-				
-				
-			}
-			
-			//tomorrow's matches
-			$.ajax({
-				url:"http://worldcup.sfg.io/matches/tomorrow",
-				dataType: "json"
-			}).done(
-				function(result){
-					if(result.length>0){
-						$placeholder.find("#tomorrow").remove();
-						$clone = $tpl_today_matches.clone().attr("id","tomorrow");
-						$clone.find("h2").html("Partidos de mañana");
-						for(var par in result){
-							var $p =$("<p>");
-							var d = new Date(result[par].datetime);
-							$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " +  d.getHours() + "hs" +" ]");
-							$clone.append($p);
-							argMatches();
-						}
-						$placeholder.append($clone);
-					}
-				}
-			);
-			
-			//partidos de argentina
-			function argMatches(){
-				$.ajax({
-					url:"http://worldcup.sfg.io/matches/country?fifa_code=ARG",
-					dataType: "json"
-				}).done(
-					function(result){
-						if(result.length>0){
-							$placeholder.find("#arg-matches").remove();
-							$clone = $tpl_today_matches.clone().attr("id","arg-matches");
-							$clone.find("h2").html("Partidos de Argentina");
-								for(var par in result){
-									var $p =$("<p>");
-									var d = new Date(result[par].datetime);
-									var status ="";
-									status = (result[par].status == "in progress") ? "<strong>En vivo</strong>" : "";
-									status = (result[par].status == "completed") ? "<strong>Finalizado</strong>" : status;
-									$p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getDate() + "/" + parseInt(d.getMonth() +1) + " - " + d.getHours() + "hs" +" ] " + status );
-									$clone.append($p);
-								}
-								$placeholder.append($clone);							
-						}
-					}
-				);
-			}
-			
-			var interval = setInterval(function(){getDataMatches();}, timeRefreshResults);
+           }
+	       $(document).ready(function() { //
+                $(".button-refresh").click(function (event) {
+                    event.preventDefault();
+                    refreshRanking();
+                });
+                refreshRanking();
+               
+                getDataMatches();
+                currentMatch();
+               
+
+                var timeRefreshResults = 30000;
+                var $placeholder = $("#placeholder-partidos");
+                var $placeholder_current = $("#placeholder-current");
+                var $tpl_today_matches = $("#tpl_todays_matches");
+
+
+                var $clone;
+                function getDataMatches(){
+                    if($clone != undefined){ $clone.addClass("load"); }
+                    $.ajax({
+                        url:"http://worldcup.sfg.io/matches/today",
+                        dataType: "json"
+                    }).done(function(result){
+                            if(result.length > 0 ){
+                                $placeholder.find("#todays").remove();
+                                $clone = $tpl_today_matches.clone().attr("id","todays");
+                                for(var par in result) {
+                                    var $p =$("<p>");
+                                    var d = new Date(result[par].datetime);
+                                    var status ="";
+                                    status = (result[par].status == "in progress") ? "<strong>En juego</strong>" : "";
+                                    status = (result[par].status == "completed") ? "<strong>Finalizado</strong>" : status;
+                                    $p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getHours() + "hs" +" ] " + status );
+                                    $clone.append($p);
+                                    //console.log($clone);
+
+                                }
+                                $placeholder.prepend($clone);
+                                $clone.removeClass("load");
+                                currentMatch();
+                            }
+                    });
+
+
+                }
+
+                //tomorrow's matches
+                $.ajax({
+                    url:"http://worldcup.sfg.io/matches/tomorrow",
+                    dataType: "json"
+                }).done(function (result) {
+                        if(result.length>0){
+                            $placeholder.find("#tomorrow").remove();
+                            $clone = $tpl_today_matches.clone().attr("id","tomorrow");
+                            $clone.find("h2").html("Partidos de mañana");
+                            for(var par in result){
+                                var $p =$("<p>");
+                                var d = new Date(result[par].datetime);
+                                $p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " +  d.getHours() + "hs" +" ]");
+                                $clone.append($p);
+                                argMatches();
+                            }
+                            $placeholder.append($clone);
+                        }
+
+                });
+
+                //partidos de argentina
+                function argMatches(){
+                    $.ajax({
+                        url:"http://worldcup.sfg.io/matches/country?fifa_code=ARG",
+                        dataType: "json"
+                    }).done(function (result) {
+                            if(result.length > 0) {
+                                $placeholder.find("#arg-matches").remove();
+                                $clone = $tpl_today_matches.clone().attr("id","arg-matches");
+                                $clone.find("h2").html("Partidos de Argentina");
+                                for (var par in result) {
+                                    var $p =$("<p>");
+                                    var d = new Date(result[par].datetime);
+                                    var status ="";
+                                    status = (result[par].status == "in progress") ? "<strong>En juego</strong>" : "";
+                                    status = (result[par].status == "completed") ? "<strong>Finalizado</strong>" : status;
+                                    $p.addClass("match-results").html(result[par].home_team.country + " (" + result[par].home_team.goals + ")  VS  " + result[par].away_team.country + " (" + result[par].away_team.goals + ") [ " + d.getDate() + "/" + parseInt(d.getMonth() +1) + " - " + d.getHours() + "hs" +" ] " + status );
+                                    $clone.append($p);
+                                }
+                                $placeholder.append($clone);
+                            }
+                        }
+                    );
+                }
+               
+                function currentMatch () {
+                    $.ajax({
+                        url: "http://worldcup.sfg.io/matches/current",
+                        dataType: "json"
+                    }).done(function (result) {
+                            if(result.length > 0) {
+                                if (current.length > 0 && !(result[0].away_team.goals === current[0].away_team.goals && result[0].home_team.goals === current[0].home_team.goals)) {
+                                    pushNotification(result[0].home_team.country + " " + result[0].home_team.goals + " - " + result[0].away_team.country + " " + result[0].away_team.goals);
+                                }
+                                $clone = $tpl_today_matches.clone().attr("id", "current");
+                                $clone.find("h2").html("En juego");
+                                for(var par in result){
+                                    var $p =$("<p>");
+                                    var d = new Date(result[par].datetime);
+                                    $p.addClass("match-results").html(result[par].home_team.country + " " + result[par].home_team.goals + "  -  " + result[par].away_team.country + " " + result[par].away_team.goals );
+                                    $clone.append($p);
+                                }
+                                $placeholder_current.find("#current").remove();
+                                $placeholder_current.prepend($clone);
+                                
+                                current = result;
+                            }
+                        }
+                    );
+                }              
+
+
+                var interval = setInterval(function(){
+                    getDataMatches();
+                }, timeRefreshResults);
          });
        </script>
     </body>
