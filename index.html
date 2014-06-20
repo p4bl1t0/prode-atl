@@ -26,17 +26,17 @@
                 url: "http://prode.162.243.6.106.xip.io/getter.php?grupo=Grupo ATL ROJO"
             }).done(function (result) {
                 var _html = $(result);
-                _table = _html.find("#posiciones_grupo").find("table");
+                _table = _html.find("table");
                 $.ajax({
                     url: "http://prode.162.243.6.106.xip.io/getter.php?grupo=Grupo ATL Verde"
                 }).done(function (result) {
                     var _html = $(result);
-                    _table.find("tbody").append(_html.find("#posiciones_grupo").find("table").find("tr:not(:first)"));
+                    _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
                     $.ajax({
                         url: "http://prode.162.243.6.106.xip.io/getter.php?grupo=Grupo ATL Negro"
                     }).done(function (result) {
                         var _html = $(result);
-                        _table.find("tbody").append(_html.find("#posiciones_grupo").find("table").find("tr:not(:first)"));
+                        _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
                         _table.prepend($("<thead>").append(_table.find("tr:first")));
                         //_table.find("tbody tr:first").remove();
                         _table.find("tr").each(function(){ $(this).find("td:first").remove(); });
