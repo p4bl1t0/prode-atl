@@ -41,6 +41,10 @@
 .table-ranking tbody tr:nth-child(2n) {
    background: #F0F0F0;
 }
+.box-content h2 a{
+	font-size:14px;
+}
+
 @media (max-width:680px) {
     .table-ranking tr td:nth-child(n+3) {
        display: none;
