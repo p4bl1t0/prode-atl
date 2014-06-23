@@ -80,19 +80,19 @@ var is_android = ((nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > 
                 $.ajax({
                     url: baseURL + "/getter.php?grupo=Grupo ATL ROJO"
                 }).done(function (result) {
-                    console.log("llego info de MundialconAmigos");
+                    //console.log("llego info de MundialconAmigos");
                     var _html = $(result);
                     _table = _html.find("table");
                     $.ajax({
                         url: baseURL + "/getter.php?grupo=Grupo ATL Verde"
                     }).done(function (result) {
-                        console.log("llego info de MundialconAmigos");
+                        //console.log("llego info de MundialconAmigos");
                         var _html = $(result);
                         _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
                         $.ajax({
                             url: baseURL + "/getter.php?grupo=Grupo ATL Negro"
                         }).done(function (result) {
-                            console.log("llego info de MundialconAmigos");
+                            //console.log("llego info de MundialconAmigos");
                             var _html = $(result);
                             _table.addClass("pure-table pure-table-bordered table-ranking").removeAttr("align").removeAttr("width");
                             _table.find("td b").each(function(){
@@ -226,8 +226,14 @@ var is_android = ((nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > 
                         dataType: "json"
                     }).done(function (result) {
                             if(result.length > 0) {
-                                if (current.length > 0 && !(result[0].away_team.goals === current[0].away_team.goals && result[0].home_team.goals === current[0].home_team.goals)) {
-                                    pushNotification(result[0].home_team.country + " " + result[0].home_team.goals + " - " + result[0].away_team.country + " " + result[0].away_team.goals);
+                                if (current.length > 0) {
+                                    for(var i = 0; i < current.length; i++) {
+                                         if(result[i] !== undefined && !(result[i].away_team.goals === current[i].away_team.goals && result[i].home_team.goals === current[i].home_team.goals)) {
+                                                pushNotification(result[i].home_team.country + " " + result[i].home_team.goals + " - " + result[i].away_team.country + " " + result[i].away_team.goals);
+                                            }
+                                        console.log(current[i]);
+                                        console.log(result[i]);
+                                    }
                                 }
                                 $clone = $tpl_today_matches.clone().attr("id", "current");
                                 $clone.find("h2").html("En juego");
