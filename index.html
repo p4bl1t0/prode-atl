@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Prode Autologico</title>
+        <meta charset="utf-8" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css" />
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-old-ie-min.css">
+        <![endif]-->
+        <!--[if gt IE 8]><!-->
+            <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/grids-responsive-min.css">
+        <!--<![endif]-->
+        <link rel="stylesheet" href="css/app.css" />
+        <link rel="stylesheet" href="https://cdn.rawgit.com/kbjr/Notifications/master/notification.css" />
+        
+    </head>
+    <body>
+        <div class="header">
+            <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal">
+                <a href="#" class="pure-menu-heading">Prode Autologico</a>
+                <!--<ul>
+                    <li class="pure-menu-selected"><a href="#">Home</a></li>
+                </ul>-->
+            </div>
+        </div>
+        <div class="content">
+            <div class="pure-g">
+                <div class="pure-u-1 pure-u-md-1-3">
+                   <div class="box-content">
+                       <div id="placeholder-current"></div>
+                       <div id="placeholder-partidos"></div>
+					   <br /><br />
+					   <a href="http://mundialconamigos.com" target="_blank" ></a>
+                   </div>
+                </div>
+                <div class="pure-u-1 pure-u-md-2-3">
+                    <div class="box-content">
+                        <h2>Ranking del prode - <button class="pure-button button-refresh pure-button-active pure-button-primary">Actualizar</button></h2>
+						<img src="http://upload.wikimedia.org/wikipedia/commons/4/42/Loading.gif" alt="Cargando" id="img-cargando" >
+                        <div id="placeholder-ranking"></div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>	   
+	   <div style="display:none">
+			<div class="large-6 columns" id="tpl_todays_matches">
+				<h2>Partidos de hoy</h2>
+			</div>
+	   </div>   
+       <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+       <script src="https://cdn.rawgit.com/kbjr/Notifications/master/notification.js"></script>
+       <script src="jquery.tablesorter.min.js"></script>
+       <script>
+           var current = [];
+           var nua = navigator.userAgent;
+var is_android = ((nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > -1 &&     nua.indexOf('AppleWebKit') > -1) && !(nua.indexOf('Chrome') > -1));
+           if(window.Notification !== null && window.Notification !== undefined && !is_android) {
+               if(Notification.permission !== 'granted'){
+                    Notification.requestPermission();
+                }
+           }
+           function pushNotification (message) {
+               if(window.Notification !== null && window.Notification !== undefined && !is_android) {
+                    n = new Notification( "Goooooool", {
+                        body: message, 
+                        icon : "/images/ball.ico"
+                    });
+               }
+           }
+           function refreshRanking () {
+                var baseURL = "http://prode.162.243.6.106.xip.io";
+                if(window.location.host.indexOf("127.0.0.1") >= 0) {
+                    var baseURL = "http://prode.127.0.0.1.xip.io";
+                }
+                console.log(baseURL);
+                //
+                var _table = null;
+                $.ajax({
+                    url: baseURL + "/getter.php?grupo=Grupo ATL ROJO"
+                }).done(function (result) {
+                    console.log("llego info de MundialconAmigos");
+                    var _html = $(result);
+                    _table = _html.find("table");
+                    $.ajax({
+                        url: baseURL + "/getter.php?grupo=Grupo ATL Verde"
+                    }).done(function (result) {
+                        console.log("llego info de MundialconAmigos");
+                        var _html = $(result);
+                        _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
+                        $.ajax({
+                            url: baseURL + "/getter.php?grupo=Grupo ATL Negro"
+                        }).done(function (result) {
+                            console.log("llego info de MundialconAmigos");
+                            var _html = $(result);
+                            _table.addClass("pure-table pure-table-bordered table-ranking").removeAttr("align").removeAttr("width");
+                            _table.find("td b").each(function(){
+                                if(String.trim) {
+                                    $(this).text($(this).text().trim());
+                                }
+                            });
+                            _table.find("tbody").append(_html.find("table").find("tr:not(:first)"));
+                            _table.prepend($("<thead>").append(_table.find("tr:first")));
+                            //_table.find("tbody tr:first").remove();
+                            _table.find("tr").each(function(){ $(this).find("td:first").remove(); });
+                            _table.find("tr").removeAttr("bgColor");
+                            $("#img-cargando").remove();
+                            $("#placeholder-ranking").empty().append(_table).find("table").tablesorter({sortList: [[1,1],[0,0]]})
+
+                        });
+                    });
+                });
+           }
+           function renderResult(match, showDate) {
+                var html = "";
+                var date = new Date(match.datetime);
+                var status = "";
+                var showResult = true;
+                if (match.status === "in progress") {
+                    status = "<strong>En juego</strong>";
+                } else {
+                    if (match.status === "completed") {
+                        status = "<strong>Finalizado</strong>";
+                    } else {
+                        showResult = false;
+                    }
+                }
+                html = match.home_team.country + (showResult ? " " + match.home_team.goals : "");
+                html += " - ";
+                html += match.away_team.country + (showResult ? " " + match.away_team.goals : "");
+                if(showDate & !isNaN(date.getDate())) {
+                    html += " " + date.getDate() + "/" + date.getMonth() + " ";
+                }
+                html += isNaN(date.getHours()) ? " " : " (" + date.getHours() + " hs" +") ";
+                html += status;
+                return html;
+           }
+	       $(document).ready(function() { //
+                $(".button-refresh").click(function (event) {
+                    event.preventDefault();
+                    refreshRanking();
+                });
+                refreshRanking();
+               
+                getDataMatches();
+                //currentMatch();
+               
+
+                var timeRefreshResults = 30000;
+                var $placeholder = $("#placeholder-partidos");
+                var $placeholder_current = $("#placeholder-current");
+                var $tpl_today_matches = $("#tpl_todays_matches");
+
+
+                var $clone;
+                function getDataMatches(){
+                    if($clone != undefined){ $clone.addClass("load"); }
+                    $.ajax({
+                        url:"http://worldcup.sfg.io/matches/today",
+                        dataType: "json"
+                    }).done(function(result){
+                            if(result.length > 0 ){
+                                $placeholder.find("#todays").remove();
+                                $clone = $tpl_today_matches.clone().attr("id","todays");
+                                for(var par in result) {
+                                    var $p =$("<p>");
+                                    $p.addClass("match-results").html(renderResult(result[par]));
+                                    $clone.append($p);
+                                    //console.log($clone);
+                                }
+                                $placeholder.prepend($clone);
+                                $clone.removeClass("load");
+                                currentMatch();
+                            }
+                    });
+
+
+                }
+
+                //tomorrow's matches
+                $.ajax({
+                    url:"http://worldcup.sfg.io/matches/tomorrow",
+                    dataType: "json"
+                }).done(function (result) {
+                        if(result.length > 0){
+                            $placeholder.find("#tomorrow").remove();
+                            $clone = $tpl_today_matches.clone().attr("id","tomorrow");
+                            $clone.find("h2").html("Partidos de mañana");
+                            for(var par in result){
+                                var $p =$("<p>");
+                                $p.addClass("match-results").html(renderResult(result[par]));
+                                $clone.append($p);
+                                argMatches();
+                            }
+                            $placeholder.append($clone);
+                        }
+
+                });
+
+                //partidos de argentina
+                function argMatches(){
+                    $.ajax({
+                        url:"http://worldcup.sfg.io/matches/country?fifa_code=ARG",
+                        dataType: "json"
+                    }).done(function (result) {
+                            if(result.length > 0) {
+                                $placeholder.find("#arg-matches").remove();
+                                $clone = $tpl_today_matches.clone().attr("id","arg-matches");
+                                $clone.find("h2").html("Partidos de Argentina");
+                                for (var par in result) {
+                                    var $p =$("<p>");
+                                    $p.addClass("match-results").html(renderResult(result[par], true));
+                                    
+                                    $clone.append($p);
+                                }
+                                $placeholder.append($clone);
+                            }
+                        }
+                    );
+                }
+               
+                function currentMatch () {
+                    $.ajax({
+                        url: "http://worldcup.sfg.io/matches/current",
+                        dataType: "json"
+                    }).done(function (result) {
+                            if(result.length > 0) {
+                                if (current.length > 0 && !(result[0].away_team.goals === current[0].away_team.goals && result[0].home_team.goals === current[0].home_team.goals)) {
+                                    pushNotification(result[0].home_team.country + " " + result[0].home_team.goals + " - " + result[0].away_team.country + " " + result[0].away_team.goals);
+                                }
+                                $clone = $tpl_today_matches.clone().attr("id", "current");
+                                $clone.find("h2").html("En juego");
+                                for(var par in result){
+                                    var $p =$("<p>");
+                                    var d = new Date(result[par].datetime);
+                                    $p.addClass("match-results").html(result[par].home_team.country + " " + result[par].home_team.goals + "  -  " + result[par].away_team.country + " " + result[par].away_team.goals);
+                                    $clone.append($p);
+                                }
+                                $placeholder_current.find("#current").remove();
+                                $placeholder_current.prepend($clone);
+                                
+                                current = result;
+                            } else {
+                                $clone = $tpl_today_matches.clone().attr("id", "current");
+                                $clone.append("<p>Nada en juego</p>");
+                                $placeholder_current.find("#current").remove();
+                                $placeholder_current.prepend($clone);
+                            }
+                        }
+                    );
+                }              
+
+
+                var interval = setInterval(function(){
+                    getDataMatches();
+                }, timeRefreshResults);
+         });
+       </script>
+    </body>
+</html>
