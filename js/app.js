@@ -74,18 +74,28 @@ function renderResult(match, showDate) {
     } else {
         if (match.status === "completed") {
             status = "<strong>Finalizado</strong>";
+			
+			if(match.winner === match.home_team.country ){
+				match.home_team.country = "<strong class='winner' title='Ganador'>" + match.home_team.country + "</strong>";
+			}else{
+				match.away_team.country  = "<strong class='winner' title='Ganador'>" + match.away_team.country + "</strong>";
+			}
+			
         } else {
             showResult = false;
         }
     }
-    html = match.home_team.country + (showResult ? " " + match.home_team.goals : "");
+    html = match.home_team.country + (showResult ? " " + match.home_team.goals + ( match.home_team.penalties != undefined ?  " ( " + match.home_team.penalties + " ) " : "") : "");
     html += " - ";
-    html += match.away_team.country + (showResult ? " " + match.away_team.goals : "");
+    html += match.away_team.country + (showResult ? " " + match.away_team.goals + ( match.away_team.penalties != undefined ?  " ( " + match.away_team.penalties + " ) " : "") : "");
     if (showDate & !isNaN(date.getDate())) {
         html += " " + date.getDate() + "/" + date.getMonth() + " ";
     }
     html += isNaN(date.getHours()) ? " " : " (" + date.getHours() + " hs" + ") ";
     html += status;
+	
+	
+	
     return html;
 }
 $(document).ready(function () { //
