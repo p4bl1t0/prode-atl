@@ -1,4 +1,4 @@
-<?php
+<?php 
 error_reporting(1);
 if(isset($_GET["grupo"]) && $_GET["grupo"] == "all"){
 	//buscamos los grupos ac� y armamos una sola tabla
